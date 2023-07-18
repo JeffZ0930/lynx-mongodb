@@ -13,5 +13,35 @@
         <maven.compiler.target>14</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.grapheco</groupId>
+            <artifactId>lynx</artifactId>
+            <version>0.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.tpolecat</groupId>
+            <artifactId>doobie-core_2.12</artifactId>
+            <version>1.0.0-RC2</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.32</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb.scala</groupId>
+            <artifactId>mongo-scala-driver_2.12</artifactId>
+            <version>4.10.2</version>
+        </dependency>
+
+    </dependencies>
+
 </project>
