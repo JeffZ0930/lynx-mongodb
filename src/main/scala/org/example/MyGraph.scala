@@ -13,19 +13,18 @@ import org.opencypher.v9_0.expressions.SemanticDirection.{BOTH, INCOMING, OUTGOI
 
 import java.time.LocalDate
 import java.util.Date
-import java.sql.{Connection, DriverManager, ResultSet}
+
 import org.mongodb.scala._
 import org.mongodb.scala.model.Filters._
-import org.mongodb.scala.model.Projections._
-import org.mongodb.scala.model.Sorts._
-
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
 class MyGraph extends GraphModel {
 
-  val mongoClient = MongoClient("mongodb://localhost:27017")
-  val database = mongoClient.getDatabase("test")
+  private val mongoClient = MongoClient("mongodb://root:Hc1478963!@223.193.3.252:27017")
+
+  // private val mongoClient = MongoClient("mongodb://localhost:27017")
+  private val database = mongoClient.getDatabase("test")
 
   private def myNodeAt(id: Int, tableList:Array[String]):Option[MyNode] = {
     println("myNodeAt()")
@@ -35,7 +34,7 @@ class MyGraph extends GraphModel {
       val findObservable = collection.find(equal("_id", id))
       val docList = Await.result(findObservable.toFuture(), 10.seconds)
 
-      if (!docList.isEmpty) {
+      if (docList.nonEmpty) {
         val result = rowToNode(docList.head, tableName, nodeSchema(tableName))
 
         return Some(result)
@@ -150,7 +149,20 @@ class MyGraph extends GraphModel {
 
   override def nodeAt(id: LynxId): Option[MyNode] = ???
 
-  override def nodes(): Iterator[MyNode] = ???
+  override def nodes(): Iterator[MyNode] = {
+    println("nodes()")
+    val allNodes = for (tableName <- nodeSchema.keys) yield {
+      val collection = database.getCollection(tableName)
+      val findObservable = collection.find()
+      val documentsList = Await.result(findObservable.toFuture(), 10.seconds)
+      documentsList.iterator.flatMap { doc =>
+        val node = rowToNode(doc, tableName, nodeSchema(tableName))
+        Iterator(node)
+      }
+    }
+    println("nodes() finished")
+    allNodes.flatten.iterator
+  }
 
   override def nodes(nodeFilter: NodeFilter): Iterator[MyNode] = {
     println("nodes(NodeFilter)")
@@ -166,7 +178,7 @@ class MyGraph extends GraphModel {
       equal(field.toString(), value.value)
     }.toList
 
-    val findObservable = if (!filters.isEmpty) {
+    val findObservable = if (filters.nonEmpty) {
       val finalFilter = and(filters: _*)
       collection.find(finalFilter)
     } else {
@@ -184,7 +196,25 @@ class MyGraph extends GraphModel {
     result
   }
 
-  override def relationships(): Iterator[PathTriple] = ???
+  override def relationships(): Iterator[PathTriple] = {
+    println("relationships()")
+
+    val allRels = for (tableName <- relSchema.keys) yield {
+      val collection = database.getCollection(tableName)
+      val findObservable = collection.find()
+      val documentsList = Await.result(findObservable.toFuture(), 10.seconds)
+
+      documentsList.iterator.flatMap { doc =>
+        val rel = rowToRel(doc, tableName, relSchema(tableName))
+        val startNode = myNodeAt(doc.get("startId").get.asInt32().getValue, relMapping(tableName)._1).get
+        val endNode = myNodeAt(doc.get("endId").get.asInt32().getValue, relMapping(tableName)._2).get
+        Iterator(PathTriple(startNode, rel, endNode))
+      }
+    }
+
+    println("relationships() finished")
+    allRels.flatten.iterator
+  }
 
   override def relationships(relationshipFilter: RelationshipFilter): Iterator[PathTriple] = {
     println("relationships(RelFilter)")
@@ -196,7 +226,7 @@ class MyGraph extends GraphModel {
       equal(field.toString(), value.value)
     }.toList
 
-    val findObservable = if (!filters.isEmpty) {
+    val findObservable = if (filters.nonEmpty) {
       val finalFilter = and(filters: _*)
       collection.find(finalFilter)
     } else {

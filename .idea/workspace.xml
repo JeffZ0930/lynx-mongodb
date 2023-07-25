@@ -4,13 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3d281189-3901-4192-a90d-bd956d59a63a" name="Changes" comment="Create basic project structure, add test resources">
+    <list default="true" id="3d281189-3901-4192-a90d-bd956d59a63a" name="Changes" comment="Finished nodes(), rel(), and expand() API. Passed IS1 test.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/org/example/MyGraph.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/org/example/MyGraph.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/org/example/MyId.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/org/example/MyId.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/resources/LDBC/interactive-short-1.cypher" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/LDBC/interactive-short-1.cypher" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/scala/org/example/MongoDBTest.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/scala/org/example/MongoDBTest.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -121,7 +117,9 @@
       <workItem from="1689730105011" duration="4542000" />
       <workItem from="1689817555293" duration="7800000" />
       <workItem from="1689844361534" duration="2992000" />
-      <workItem from="1689904402076" duration="16542000" />
+      <workItem from="1689904402076" duration="16744000" />
+      <workItem from="1690165054980" duration="16159000" />
+      <workItem from="1690255333890" duration="5534000" />
     </task>
     <task id="LOCAL-00001" summary="Create basic project structure, add test resources">
       <created>1689665069371</created>
@@ -130,7 +128,14 @@
       <option name="project" value="LOCAL" />
       <updated>1689665069371</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Finished nodes(), rel(), and expand() API. Passed IS1 test.">
+      <created>1689933940458</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1689933940458</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -138,17 +143,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Create basic project structure, add test resources" />
-    <option name="LAST_COMMIT_MESSAGE" value="Create basic project structure, add test resources" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/src/main/scala/org/example/MyGraph.scala</url>
-          <line>242</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="Finished nodes(), rel(), and expand() API. Passed IS1 test." />
+    <option name="LAST_COMMIT_MESSAGE" value="Finished nodes(), rel(), and expand() API. Passed IS1 test." />
   </component>
 </project>
