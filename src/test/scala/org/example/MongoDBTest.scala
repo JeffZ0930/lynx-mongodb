@@ -34,7 +34,7 @@ class MongoDBTest {
   @Test
   def IS1(): Unit = {
     val q = getQuery("interactive-short-1.cypher")
-    val p = Map("personId" -> 1, "placeId" -> 1, "firstName" -> "John")
+    val p = Map("personId" -> "300000000008100", "placeId" -> "200000000000981", "firstName" -> "Yang")
     //预热
     MyGraph.run(q, p)
 

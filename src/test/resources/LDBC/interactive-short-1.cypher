@@ -3,22 +3,16 @@
 :param personId: 10995116277794
  */
 
-MATCH (n:Person {`_id`: $personId }) -[:isLocatedIn]-> (p:Place)
+MATCH (n:Person {`id:ID`: $personId }) -[:isLocatedIn]-> (p:Place)
 RETURN
-    n.firstName AS firstName,
-    n.lastName AS lastName,
-    n.birthday AS birthday,
-    n.locationIP AS locationIP,
-    n.browserUsed AS browserUsed,
-    p.`_id` AS cityId,
-    n.gender AS gender,
-    n.creationDate AS creationDat
-
-//MATCH (n:Person {`firstName`: $firstName }) -[:isLocatedIn]-> (p:Place)
-//RETURN
-//  n.firstName AS firstName,
-//  n.lastName AS lastName,
-//  p.`_id` AS cityId
+  n.firstName AS firstName,
+  n.lastName AS lastName,
+  n.birthday AS birthday,
+  n.locationIP AS locationIP,
+  n.browserUsed AS browserUsed,
+  p.`id:ID` AS cityId,
+  n.gender AS gender,
+  n.creationDate AS creationDate
 
 //MATCH (n:Person {`id:ID`: $personId }) -[:isLocatedIn]-> (p:Place) <-[:isLocatedIn]- (n2:Person)
 //RETURN
@@ -32,21 +26,26 @@ RETURN
 //    n2.gender AS gender,
 //    n2.creationDate AS creationDate
 
-//MATCH (p:Place {`_id`: $placeId}) <-[:isLocatedIn]- (n:Person)
+//MATCH (p:Place {`id:ID`: $placeId}) <-[:isLocatedIn]- (n:Person)
 //RETURN
-//  n.`_id` AS ID,
+//  n.`id:ID` AS ID,
 //  n.firstName AS firstName,
 //  n.lastName AS LastName
 
-//MATCH (n:Person) -[:isLocatedIn]-> (p:Place {`_id`: $placeId})
+//MATCH (n:Person) -[:isLocatedIn]-> (p:Place {`id:ID`: $placeId})
 //RETURN *
 
-//MATCH (p1:Person {`_id`: $personId }) <-[:knows]- (p2:Person)
+//MATCH (n:Person {`id:ID`: $personId }) -[:isLocatedIn]-> (p:Place)
 //RETURN
-//  p2.`_id` AS ID,
+//  n.`id:ID` as personId,
+//  n.firstName as firstName,
+//  n.lastName as lastName,
+//  p.`id:ID` as placeId,
+//  p.name as placeName
+
+//MATCH (p1:Person {`id:ID`: $personId }) <-[:knows]- (p2:Person)
+//RETURN
+//  p2.`id:ID` AS ID,
 //  p2.firstName AS firstName,
 //  p2.lastName AS lastName,
 //  p2.birthday AS birthday
-
-
-

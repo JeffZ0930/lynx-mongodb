@@ -13,30 +13,30 @@ import org.opencypher.v9_0.expressions.SemanticDirection.{BOTH, INCOMING, OUTGOI
 
 import java.time.LocalDate
 import java.util.Date
-
 import org.mongodb.scala._
 import org.mongodb.scala.model.Filters._
+
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
 class MyGraph extends GraphModel {
 
-  private val mongoClient = MongoClient("mongodb://root:Hc1478963!@223.193.3.252:27017")
+  private val mongoClient = MongoClient("mongodb://admin:admin123@10.0.82.144:27017")
+  private val database = mongoClient.getDatabase("db1")
 
-  // private val mongoClient = MongoClient("mongodb://localhost:27017")
-  private val database = mongoClient.getDatabase("test")
-
-  private def myNodeAt(id: Int, tableList:Array[String]):Option[MyNode] = {
+  def myNodeAt(id: String, tableList:Array[String]):Option[MyNode] = {
     println("myNodeAt()")
+    val startTime1 = System.currentTimeMillis()
 
     for (tableName <- tableList) {
       val collection = database.getCollection(tableName)
-      val findObservable = collection.find(equal("_id", id))
-      val docList = Await.result(findObservable.toFuture(), 10.seconds)
+      val findObservable = collection.find(equal("id:ID", id))
+      val docList = Await.result(findObservable.toFuture(), 300.seconds)
 
       if (docList.nonEmpty) {
         val result = rowToNode(docList.head, tableName, nodeSchema(tableName))
 
+        println("myNodeAt finished in " + (System.currentTimeMillis() - startTime1) + " ms")
         return Some(result)
       }
     }
@@ -48,22 +48,21 @@ class MyGraph extends GraphModel {
     val propertyMap = config.indices.map { i =>
       val columnName = config(i)._1
       val columnType = config(i)._2
-      val rawValue = row.get(columnName)
-      val columnValue =
-        try {
+      val rawValue = row.get(columnName).get
+      val columnValue = if (rawValue.isNull) {
+        LynxNull
+      } else {
           columnType match {
-            case "BIGINT" => LynxValue(rawValue.get.asInt64().getValue)
-            case "INT" => LynxInteger(rawValue.get.asInt32().getValue)
-            case "String" => LynxString(rawValue.get.asString().getValue)
-            case _ => LynxString(rawValue.get.asString().getValue)
+            // case "INT" => LynxInteger(rawValue.get.asInt32().getValue)
+            case "String" => LynxString(rawValue.asString().getValue)
+            case _ => LynxString(rawValue.asString().getValue)
           }
-        } catch {
-            case _: NullPointerException => LynxNull
-        }
+      }
+
       LynxPropertyKey(columnName) -> columnValue
     }.toMap
 
-    val id = MyId(row.get("_id").get.asInt32().getValue)
+    val id = MyId(row.get("id:ID").get.asString().getValue.toLong)
     val label = Seq(LynxNodeLabel(tableName))
     MyNode(id, label, propertyMap)
   }
@@ -72,38 +71,57 @@ class MyGraph extends GraphModel {
     val propertyMap = config.indices.map { i =>
       val columnName = config(i)._1
       val columnType = config(i)._2
-      val rawValue = row.get(columnName)
-      val columnValue =
-        try {
-          columnType match {
-            case "BIGINT" => LynxValue(rawValue.get.asInt64().getValue)
-            case "INT" => LynxInteger(rawValue.get.asInt32().getValue)
-            case "String" => LynxString(rawValue.get.asString().getValue)
-            case _ => LynxString(rawValue.get.asString().getValue)
-          }
-        } catch {
-          case _: NullPointerException => LynxNull
+      val rawValue = row.get(columnName).get
+      val columnValue = if (rawValue.isNull) {
+        LynxNull
+      } else {
+        columnType match {
+          // case "INT" => LynxInteger(rawValue.get.asInt32().getValue)
+          case "String" => LynxString(rawValue.asString().getValue)
+          case _ => LynxString(rawValue.asString().getValue)
         }
+      }
       LynxPropertyKey(columnName) -> columnValue
     }.toMap
 
-    val id = MyId(row.get("_id").get.asInt32().getValue)
-    val startId = MyId(row.get("startId").get.asInt32().getValue)
-    val endId = MyId(row.get("endId").get.asInt32().getValue)
+    val id = MyId(row.get("REL_ID").get.asString().getValue.toLong)
+    val startId = MyId(row.get(":START_ID").get.asString().getValue.toLong)
+    val endId = MyId(row.get(":END_ID").get.asString().getValue.toLong)
 
     MyRelationship(id, startId, endId, Some(LynxRelationshipType(tableName)), propertyMap)
   }
 
   private val nodeSchema = Map(
-    "Person" -> Array(("_id", "INT"), ("LABEL", "String"), ("creationDate", "Date"), ("firstName", "String"),
+    "Person" -> Array(("id:ID", "String"), (":LABEL", "String"), ("creationDate", "Date"), ("firstName", "String"),
       ("lastName", "String"), ("gender", "String"), ("birthday", "Date"), ("locationIP", "String"), ("browserUsed", "String"),
       ("languages", "String"), ("emails", "String")),
-    "Place" -> Array(("_id", "INT"), ("LABEL", "String"), ("name", "String"), ("url", "String"), ("type", "String")),
+    "Place" -> Array(("id:ID", "String"), (":LABEL", "String"), ("name", "String"), ("url", "String"), ("type", "String")),
+    "Organisation" -> Array(("id:ID", "String"), (":LABEL", "String"), ("type", "String"), ("name", "String"), ("url", "String")),
+    "Comment" -> Array(("id:ID", "String"), (":LABEL", "String"), ("creationDate", "Date"), ("locationIP", "String"),
+      ("browserUsed", "String"), ("content", "String"), ("length", "INT")),
+    "Post" -> Array(("id:ID", "String"), ("creationDate", "Date"), (":LABEL", "String"), ("imageFile", "String"),
+      ("locationIP", "String"), ("browserUsed", "String"), ("language", "String"), ("content", "String"), ("length", "INT")),
+    "Forum" -> Array(("id:ID", "String"), ("creationDate", "Date"), (":LABEL", "String"), ("title", "String")),
+    "Tag" -> Array(("id:ID", "String"), (":LABEL", "String"), ("name", "String"), ("url", "String")),
+    "Tagclass" -> Array(("id:ID", "String"), (":LABEL", "String"), ("name", "String"), ("url", "String"))
   )
 
   private val relSchema = Map(
-    "knows" -> Array(("_id", "INT"), ("LABEL", "String"), ("creationDate", "Date"), ("startId", "INT"), ("endId", "INT")),
-    "isLocatedIn" -> Array(("_id", "INT"), ("LABEL", "String"), ("startId", "INT"), ("endId", "INT"), ("creationDate", "Date")),
+    "knows" -> Array(("REL_ID", "BIGINT"), (":TYPE", "String"), ("creationDate", "Date"), (":START_ID", "BIGINT"), (":END_ID", "BIGINT")),
+    "isLocatedIn" -> Array(("REL_ID", "BIGINT"), (":TYPE", "String"), (":START_ID", "BIGINT"), (":END_ID", "BIGINT"), ("creationDate", "Date")),
+    "containerOf" -> Array(("REL_ID", "BIGINT"), (":TYPE", "String"), ("creationDate", "Date"), (":START_ID", "BIGINT"), (":END_ID", "BIGINT")),
+    "hasCreator" -> Array(("REL_ID", "BIGINT"), (":TYPE", "String"), ("creationDate", "Date"), (":START_ID", "BIGINT"), (":END_ID", "BIGINT")),
+    "hasInterest" -> Array(("REL_ID", "BIGINT"), (":TYPE", "String"), ("creationDate", "Date"), (":START_ID", "BIGINT"), (":END_ID", "BIGINT")),
+    "hasMember" -> Array(("REL_ID", "BIGINT"), (":TYPE", "String"), ("creationDate", "Date"), (":START_ID", "BIGINT"), (":END_ID", "BIGINT")),
+    "hasModerator" -> Array(("REL_ID", "BIGINT"), (":TYPE", "String"), ("creationDate", "Date"), (":START_ID", "BIGINT"), (":END_ID", "BIGINT")),
+    "hasTag" -> Array(("REL_ID", "BIGINT"), (":TYPE", "String"), ("creationDate", "Date"), (":START_ID", "BIGINT"), (":END_ID", "BIGINT")),
+    "hasType" -> Array(("REL_ID", "BIGINT"), (":TYPE", "String"), (":START_ID", "BIGINT"), (":END_ID", "BIGINT")),
+    "isPartOf" -> Array(("REL_ID", "BIGINT"), (":TYPE", "String"), (":START_ID", "BIGINT"), (":END_ID", "BIGINT")),
+    "isSubclassOf" -> Array(("REL_ID", "BIGINT"), (":TYPE", "String"), (":START_ID", "BIGINT"), (":END_ID", "BIGINT")),
+    "likes" -> Array(("REL_ID", "BIGINT"), (":TYPE", "String"), ("creationDate", "Date"), (":START_ID", "BIGINT"), (":END_ID", "BIGINT")),
+    "replyOf" -> Array(("REL_ID", "BIGINT"), (":TYPE", "String"), ("creationDate", "Date"), (":START_ID", "BIGINT"), (":END_ID", "BIGINT")),
+    "studyAt" -> Array(("REL_ID", "BIGINT"), (":TYPE", "String"), ("creationDate", "Date"), (":START_ID", "BIGINT"), (":END_ID", "BIGINT"), ("classYear", "INT")),
+    "workAt" -> Array(("REL_ID", "BIGINT"), (":TYPE", "String"), ("creationDate", "Date"), (":START_ID", "BIGINT"), (":END_ID", "BIGINT"), ("workFrom", "INT"))
   )
 
   private val relMapping = Map(
@@ -146,15 +164,14 @@ class MyGraph extends GraphModel {
 
     override def commit: Boolean = {true}
   }
-
-  override def nodeAt(id: LynxId): Option[MyNode] = ???
+  override def nodeAt(id: LynxId): Option[LynxNode] = ???
 
   override def nodes(): Iterator[MyNode] = {
     println("nodes()")
     val allNodes = for (tableName <- nodeSchema.keys) yield {
       val collection = database.getCollection(tableName)
       val findObservable = collection.find()
-      val documentsList = Await.result(findObservable.toFuture(), 10.seconds)
+      val documentsList = Await.result(findObservable.toFuture(), 300.seconds)
       documentsList.iterator.flatMap { doc =>
         val node = rowToNode(doc, tableName, nodeSchema(tableName))
         Iterator(node)
@@ -166,7 +183,7 @@ class MyGraph extends GraphModel {
 
   override def nodes(nodeFilter: NodeFilter): Iterator[MyNode] = {
     println("nodes(NodeFilter)")
-
+    val startTime1 = System.currentTimeMillis()
     if (nodeFilter.labels.isEmpty && nodeFilter.properties.isEmpty) {
       return nodes()
     }
@@ -184,15 +201,15 @@ class MyGraph extends GraphModel {
     } else {
       collection.find()
     }
-
-    val documentsList = Await.result(findObservable.toFuture(), 10.seconds)
-
+    println("checkpoint1: " + (System.currentTimeMillis() - startTime1) + " ms")
+    val documentsList = Await.result(findObservable.toFuture(), 300.seconds)
+    println("checkpoint2: " + (System.currentTimeMillis() - startTime1) + " ms")
     val result = documentsList.iterator.flatMap { doc =>
       val node = rowToNode(doc, tableName, nodeSchema(tableName))
       Iterator(node)
     }
 
-    println("nodes(NodeFilter) finished")
+    println("nodes(nodeFilter) finished in " + (System.currentTimeMillis() - startTime1) + " ms")
     result
   }
 
@@ -200,14 +217,15 @@ class MyGraph extends GraphModel {
     println("relationships()")
 
     val allRels = for (tableName <- relSchema.keys) yield {
+      println(s"Getting from $tableName")
       val collection = database.getCollection(tableName)
       val findObservable = collection.find()
-      val documentsList = Await.result(findObservable.toFuture(), 10.seconds)
+      val documentsList = Await.result(findObservable.toFuture(), 300.seconds)
 
       documentsList.iterator.flatMap { doc =>
         val rel = rowToRel(doc, tableName, relSchema(tableName))
-        val startNode = myNodeAt(doc.get("startId").get.asInt32().getValue, relMapping(tableName)._1).get
-        val endNode = myNodeAt(doc.get("endId").get.asInt32().getValue, relMapping(tableName)._2).get
+        val startNode = myNodeAt(doc.get(":START_ID").get.asString().getValue, relMapping(tableName)._1).get
+        val endNode = myNodeAt(doc.get(":END_ID").get.asString().getValue, relMapping(tableName)._2).get
         Iterator(PathTriple(startNode, rel, endNode))
       }
     }
@@ -218,6 +236,7 @@ class MyGraph extends GraphModel {
 
   override def relationships(relationshipFilter: RelationshipFilter): Iterator[PathTriple] = {
     println("relationships(RelFilter)")
+    val startTime1 = System.currentTimeMillis()
 
     val tableName = relationshipFilter.types.head.toString()
     val collection = database.getCollection(tableName)
@@ -233,27 +252,29 @@ class MyGraph extends GraphModel {
       collection.find()
     }
 
-    val documentsList = Await.result(findObservable.toFuture(), 10.seconds)
+    val documentsList = Await.result(findObservable.toFuture(), 300.seconds)
 
     val result = documentsList.iterator.flatMap { doc =>
       val rel = rowToRel(doc, tableName, relSchema(tableName))
-      val startNode = myNodeAt(doc.get("startId").get.asInt32().getValue, relMapping(tableName)._1).get
-      val endNode = myNodeAt(doc.get("endId").get.asInt32().getValue, relMapping(tableName)._2).get
+      val startNode = myNodeAt(doc.get(":START_ID").get.asString().getValue, relMapping(tableName)._1).get
+      val endNode = myNodeAt(doc.get(":END_ID").get.asString().getValue, relMapping(tableName)._2).get
       Iterator(PathTriple(startNode, rel, endNode))
     }
 
-    println("relationships(RelFilter) finished")
+    println("relationships(RelFilter) finished in " + (System.currentTimeMillis() - startTime1) + " ms")
     result
   }
 
   override def expand(id: LynxId, filter: RelationshipFilter, direction: SemanticDirection): Iterator[PathTriple] = {
     println("expand()")
+    val startTime1 = System.currentTimeMillis()
+
     if (direction == BOTH) {
       return expand(id, filter, OUTGOING) ++ expand(id, filter, INCOMING)
     }
 
     val relType = filter.types.head.toString()
-    val startId = id.toLynxInteger.value.toInt
+    val startId = id.toString()
     val startNode = direction match {
       case OUTGOING => myNodeAt(startId, relMapping(relType)._1)
       case INCOMING => myNodeAt(startId, relMapping(relType)._2)
@@ -265,24 +286,24 @@ class MyGraph extends GraphModel {
     val filters = filter.properties.map { case (field, value) =>
       equal(field.toString(), value.value)
     }.toList :+ (direction match {
-      case OUTGOING => equal("startId", startId)
-      case INCOMING => equal("endId", startId)
+      case OUTGOING => equal(":START_ID", startId)
+      case INCOMING => equal(":END_ID", startId)
     })
     val finalFilter = and(filters: _*)
 
     val collection = database.getCollection(relType)
     val findObservable = collection.find(finalFilter)
-    val documentsList = Await.result(findObservable.toFuture(), 10.seconds)
+    val documentsList = Await.result(findObservable.toFuture(), 300.seconds)
 
     val result = documentsList.iterator.flatMap { doc =>
       val endNode = direction match {
-        case OUTGOING => myNodeAt(doc.get("endId").get.asInt32().getValue, relMapping(relType)._2).get
-        case INCOMING => myNodeAt(doc.get("startId").get.asInt32().getValue, relMapping(relType)._1).get
+        case OUTGOING => myNodeAt(doc.get(":END_ID").get.asString().getValue, relMapping(relType)._2).get
+        case INCOMING => myNodeAt(doc.get(":START_ID").get.asString().getValue, relMapping(relType)._1).get
       }
       Iterator(PathTriple(startNode.get, rowToRel(doc, relType, relSchema(relType)), endNode))
     }
 
-    println("expand() finished")
+    println("expand() finished in " + (System.currentTimeMillis() - startTime1) + " ms")
     result
   }
 
@@ -290,5 +311,4 @@ class MyGraph extends GraphModel {
 
   def run(query: String, param: Map[String, Any] = Map.empty[String, Any]): LynxResult = runner.run(query, param)
 }
-
 

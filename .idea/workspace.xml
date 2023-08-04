@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3d281189-3901-4192-a90d-bd956d59a63a" name="Changes" comment="Finished nodes(), rel(), and expand() API. Passed IS1 test.">
+    <list default="true" id="3d281189-3901-4192-a90d-bd956d59a63a" name="Changes" comment="finished nodes() and relationships()">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/org/example/MyGraph.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/org/example/MyGraph.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/LDBC/interactive-short-1.cypher" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/LDBC/interactive-short-1.cypher" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/scala/org/example/MongoDBTest.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/scala/org/example/MongoDBTest.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,7 +39,7 @@
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Global Libraries&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15722656&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.48723897&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;,
@@ -47,7 +49,7 @@
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
   </component>
-  <component name="RunManager" selected="JUnit.MongoDBTest.IS1">
+  <component name="RunManager" selected="JUnit.MongoDBTest.IS3">
     <configuration name="MongoDBTest.IS1" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="lynx-mongodb" />
       <extension name="coverage">
@@ -80,7 +82,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MySQLTest.IS1" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="MongoDBTest.IS3" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="lynx-mongodb" />
       <extension name="coverage">
         <pattern>
@@ -89,8 +91,40 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="org.example" />
-      <option name="MAIN_CLASS_NAME" value="org.example.MySQLTest" />
-      <option name="METHOD_NAME" value="IS1" />
+      <option name="MAIN_CLASS_NAME" value="org.example.MongoDBTest" />
+      <option name="METHOD_NAME" value="IS3" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MongoDBTest.IS4" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="lynx-mongodb" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.example.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.example" />
+      <option name="MAIN_CLASS_NAME" value="org.example.MongoDBTest" />
+      <option name="METHOD_NAME" value="IS4" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MongoDBTest.IS7" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="lynx-mongodb" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.example.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.example" />
+      <option name="MAIN_CLASS_NAME" value="org.example.MongoDBTest" />
+      <option name="METHOD_NAME" value="IS7" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -98,9 +132,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.MongoDBTest.IS3" />
         <item itemvalue="JUnit.MongoDBTest.IS1" />
         <item itemvalue="JUnit.MongoDBTest.IS2" />
-        <item itemvalue="JUnit.MySQLTest.IS1" />
+        <item itemvalue="JUnit.MongoDBTest.IS4" />
+        <item itemvalue="JUnit.MongoDBTest.IS7" />
       </list>
     </recent_temporary>
   </component>
@@ -119,7 +155,12 @@
       <workItem from="1689844361534" duration="2992000" />
       <workItem from="1689904402076" duration="16744000" />
       <workItem from="1690165054980" duration="16159000" />
-      <workItem from="1690255333890" duration="5534000" />
+      <workItem from="1690255333890" duration="14054000" />
+      <workItem from="1690334978916" duration="11982000" />
+      <workItem from="1690421506178" duration="2473000" />
+      <workItem from="1690960578273" duration="4844000" />
+      <workItem from="1691027709170" duration="13837000" />
+      <workItem from="1691112834095" duration="11716000" />
     </task>
     <task id="LOCAL-00001" summary="Create basic project structure, add test resources">
       <created>1689665069371</created>
@@ -135,7 +176,14 @@
       <option name="project" value="LOCAL" />
       <updated>1689933940458</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="finished nodes() and relationships()">
+      <created>1690269308638</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1690269308638</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -144,6 +192,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Create basic project structure, add test resources" />
     <MESSAGE value="Finished nodes(), rel(), and expand() API. Passed IS1 test." />
-    <option name="LAST_COMMIT_MESSAGE" value="Finished nodes(), rel(), and expand() API. Passed IS1 test." />
+    <MESSAGE value="finished nodes() and relationships()" />
+    <option name="LAST_COMMIT_MESSAGE" value="finished nodes() and relationships()" />
   </component>
 </project>
